@@ -1,0 +1,123 @@
+import app.web.drjackycv.buildsrc.Depends
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("com.android.library")
+    kotlin("android")
+    id("kotlin-parcelize")
+    kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
+}
+
+android {
+
+    compileSdk = Depends.Versions.androidCompileSdkVersion
+
+    defaultConfig {
+        multiDexEnabled = true
+        vectorDrawables.useSupportLibrary = true
+        minSdk = Depends.Versions.minSdkVersion
+        targetSdk = Depends.Versions.targetSdkVersion
+        testInstrumentationRunner =
+            Depends.Libraries.testInstrumentationRunner
+        consumerProguardFiles("consumer-rules.pro")
+    }
+    compileOptions {
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
+    project.tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+    buildFeatures {
+        viewBinding = true
+    }
+
+    sourceSets {
+        val test by getting
+
+        map {
+            it.java.srcDir("src/${it.name}/kotlin")
+            test.java.srcDir("${project(":domain").projectDir}/src/test/java")
+        }
+    }
+    buildTypes {
+        named("debug") { }
+        named("release") {
+            isMinifyEnabled = true
+            setProguardFiles(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            )
+        }
+    }
+    namespace = "app.web.drjackycv.presentation"
+
+}
+
+dependencies {
+    implementation(Depends.Libraries.kotlin)
+    implementation(Depends.Libraries.kotlin_reflect)
+
+    //dependency injection
+    implementation(Depends.Libraries.dagger)
+    kapt(Depends.Libraries.dagger_compiler)
+    implementation(Depends.Libraries.dagger_hilt_android)
+    implementation(Depends.Libraries.dagger_hilt_navigation_compose)
+//    kapt(Depends.Libraries.dagger_hilt_android_compiler)
+//    implementation(Depends.Libraries.dagger_hilt_core)
+    kapt(Depends.Libraries.dagger_hilt_compiler)
+//    kapt(Depends.Libraries.dagger_hilt_android_compiler)
+//    kapt(Depends.Libraries.hilt_androidx_compiler)
+    implementation(Depends.Libraries.java_inject)
+    //other
+    implementation(Depends.Libraries.timber)
+    //android
+    implementation(Depends.Libraries.appcompat)
+    implementation(Depends.Libraries.constraintlayout)
+    implementation(Depends.Libraries.material)
+    implementation(Depends.Libraries.navigation_fragment_ktx)
+    implementation(Depends.Libraries.navigation_ui_ktx)
+    implementation(Depends.Libraries.paging_runtime_ktx)
+    implementation(Depends.Libraries.paging_rx)
+    implementation(Depends.Libraries.lifecycle_livedata_ktx)
+    implementation(Depends.Libraries.lifecycle_runtime_ktx)
+    implementation(Depends.Libraries.lifecycle_viewmodel_runtime_ktx)
+    implementation(Depends.Libraries.lifecycle_common_java8)
+    implementation(Depends.Libraries.lifecycle_viewmodel_ktx)
+    implementation(Depends.Libraries.multidex)
+    implementation(Depends.Libraries.android_core_ktx)
+    implementation(Depends.Libraries.fragment_ktx)
+    implementation(Depends.Libraries.recyclerview)
+    implementation(Depends.Libraries.dataStore_preferences)
+    implementation(Depends.Libraries.coroutines_android)
+    //reactive
+    implementation(Depends.Libraries.rx_java_android)
+    implementation(Depends.Libraries.rx_binding3)
+    implementation(Depends.Libraries.rx_kotlin)
+    implementation(Depends.Libraries.autodispose)
+    implementation(Depends.Libraries.autodispose_android)
+    implementation(Depends.Libraries.autodispose_android_arch)
+    //ui
+    implementation(Depends.Libraries.glide)
+    kapt(Depends.Libraries.glide_compiler)
+    implementation(Depends.Libraries.lottie)
+    //test
+    androidTestImplementation(Depends.Libraries.test_runner)
+    androidTestImplementation(Depends.Libraries.test_rules)
+    androidTestImplementation(Depends.Libraries.test_core)
+    androidTestImplementation(Depends.Libraries.test_ext_junit)
+    androidTestImplementation(Depends.Libraries.espresso_core)
+    testImplementation(Depends.Libraries.mockk)
+    testImplementation(Depends.Libraries.coroutines_test)
+    testImplementation(Depends.Libraries.arch_core_testing)
+
+    testImplementation(project(path = ":domain", configuration = "unitTestImplementation"))
+    implementation(project(":domain"))
+}
